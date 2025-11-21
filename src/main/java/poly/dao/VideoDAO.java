@@ -10,4 +10,9 @@ public interface VideoDAO {
     void create(Video video);
     void update(Video video);
     void deleteById(String id);
+    
+    // Phương thức mới cho tìm kiếm
+    List<Video> searchByKeyword(String keyword);
+    List<Video> findByTitle(String title);
+    List<Video> findActiveVideos();
 }

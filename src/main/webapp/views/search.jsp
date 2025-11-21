@@ -105,7 +105,7 @@
         }
         .video-thumbnail {
             position: relative;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            padding-top: 56.25%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             overflow: hidden;
         }
@@ -296,8 +296,8 @@
                 </div>
                 <select class="sort-dropdown form-select w-auto">
                     <option value="relevance">Liên quan nhất</option>
-                    <option value="date">Ngày tải lên</option>
                     <option value="views">Lượt xem</option>
+                    <option value="date">Ngày tải lên</option>
                     <option value="rating">Đánh giá</option>
                 </select>
             </div>
@@ -309,53 +309,41 @@
                 <c:when test="${not empty videos}">
                     <c:forEach items="${videos}" var="video">
                         <div class="col-md-4 col-lg-3">
-                            <div class="video-card" onclick="window.location.href='<%=request.getContextPath()%>/video?id=${video.id}'">
+                            <div class="video-card">
                                 <div class="video-thumbnail">
                                     <c:choose>
                                         <c:when test="${not empty video.poster}">
                                             <img src="${video.poster}" alt="${video.title}">
                                         </c:when>
                                         <c:otherwise>
-                                            <img src="https://via.placeholder.com/320x180/667eea/ffffff?text=${video.title}" alt="${video.title}">
+                                            <div class="d-flex align-items-center justify-content-center h-100">
+                                                <i class="bi bi-film text-white" style="font-size: 4rem;"></i>
+                                            </div>
                                         </c:otherwise>
                                     </c:choose>
-                                    <span class="video-duration">
-                                        <c:choose>
-                                            <c:when test="${not empty video.duration}">
-                                                ${video.duration}
-                                            </c:when>
-                                            <c:otherwise>
-                                                10:30
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </span>
+                                    <span class="video-duration">10:30</span>
                                 </div>
                                 <div class="video-info">
                                     <h5 class="video-title">${video.title}</h5>
-                                    <p class="text-muted small mb-2">${video.description}</p>
+                                    <p class="text-muted small mb-2">
+                                        <c:choose>
+                                            <c:when test="${not empty video.description}">
+                                                ${video.description}
+                                            </c:when>
+                                            <c:otherwise>
+                                                Video chất lượng cao...
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </p>
                                     <div class="video-meta">
                                         <div class="video-stats">
                                             <span class="stat-item">
                                                 <i class="bi bi-eye-fill text-primary"></i>
-                                                <c:choose>
-                                                    <c:when test="${not empty video.views}">
-                                                        ${video.views}
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        1.2K
-                                                    </c:otherwise>
-                                                </c:choose>
+                                                ${video.views}
                                             </span>
                                             <span class="stat-item">
                                                 <i class="bi bi-heart-fill text-danger"></i>
-                                                <c:choose>
-                                                    <c:when test="${not empty video.favorites}">
-                                                        ${video.favorites.size()}
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        45
-                                                    </c:otherwise>
-                                                </c:choose>
+                                                0
                                             </span>
                                         </div>
                                         <c:if test="${video.active}">
@@ -434,7 +422,6 @@
                 this.classList.add('active');
                 
                 const filter = this.getAttribute('data-filter');
-                // Add your filter logic here
                 console.log('Filter:', filter);
             });
         });
@@ -442,7 +429,6 @@
         // Sort dropdown functionality
         document.querySelector('.sort-dropdown')?.addEventListener('change', function() {
             const sortBy = this.value;
-            // Add your sort logic here
             console.log('Sort by:', sortBy);
         });
     </script>

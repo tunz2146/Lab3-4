@@ -14,7 +14,13 @@ public class VideoDAOImpl implements VideoDAO {
     public List<Video> findAll() {
         EntityManager em = JPAUtils.getEntityManager();
         try {
-            TypedQuery<Video> query = em.createQuery("SELECT v FROM Video v", Video.class);
+            // LEFT JOIN FETCH để load cả favorites
+            TypedQuery<Video> query = em.createQuery(
+                "SELECT DISTINCT v FROM Video v " +
+                "LEFT JOIN FETCH v.favorites " +
+                "ORDER BY v.views DESC", 
+                Video.class
+            );
             return query.getResultList();
         } finally {
             JPAUtils.closeEntityManager(em);
@@ -80,6 +86,53 @@ public class VideoDAOImpl implements VideoDAO {
                 em.getTransaction().rollback();
             }
             throw e;
+        } finally {
+            JPAUtils.closeEntityManager(em);
+        }
+    }
+    
+    @Override
+    public List<Video> searchByKeyword(String keyword) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            // Tìm kiếm trong title và description
+            TypedQuery<Video> query = em.createQuery(
+                "SELECT v FROM Video v " +
+                "WHERE LOWER(v.title) LIKE LOWER(:keyword) " +
+                "OR LOWER(v.description) LIKE LOWER(:keyword) " +
+                "ORDER BY v.views DESC", 
+                Video.class
+            );
+            query.setParameter("keyword", "%" + keyword + "%");
+            return query.getResultList();
+        } finally {
+            JPAUtils.closeEntityManager(em);
+        }
+    }
+    @Override
+    public List<Video> findByTitle(String title) {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            TypedQuery<Video> query = em.createQuery(
+                "SELECT v FROM Video v WHERE LOWER(v.title) LIKE LOWER(:title)", 
+                Video.class
+            );
+            query.setParameter("title", "%" + title + "%");
+            return query.getResultList();
+        } finally {
+            JPAUtils.closeEntityManager(em);
+        }
+    }
+    
+    @Override
+    public List<Video> findActiveVideos() {
+        EntityManager em = JPAUtils.getEntityManager();
+        try {
+            TypedQuery<Video> query = em.createQuery(
+                "SELECT v FROM Video v WHERE v.active = true ORDER BY v.views DESC", 
+                Video.class
+            );
+            return query.getResultList();
         } finally {
             JPAUtils.closeEntityManager(em);
         }
